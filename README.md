@@ -7,7 +7,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-EE4C2C.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**A single-GPU trainable unconditional mesh generative model** 🚀
+**A breakthrough single-GPU trainable unconditional mesh generative model** 🚀
 
 <p align="center">
   <img src="https://via.placeholder.com/800x400?text=iFlame+Mesh+Generation" alt="iFlame Demo" width="600"/>
@@ -19,11 +19,11 @@
 
 ## ✨ Overview
 
-iFlame is a cutting-edge 3D mesh generation framework that employs a novel approach by interleaving full and linear attention mechanisms. This approach significantly reduces computational requirements while maintaining high-quality outputs, making it feasible to train on a single GPU.
+iFlame is a state-of-the-art 3D mesh generation framework that introduces a novel approach by strategically interleaving full and linear attention mechanisms. This innovative technique dramatically reduces computational requirements while preserving exceptional output quality, enabling effective training on just a single GPU.
 
 ## 🛠️ Requirements
 
-This project has been tested on:
+This project has been thoroughly tested on:
 - 🔥 PyTorch 2.5.1
 - 🖥️ CUDA 12.1
 
@@ -40,23 +40,11 @@ pip install -r requirements.txt
 
 ### 📋 Dependencies (requirements.txt)
 
-```
-torch==2.5.1
-numpy>=1.20.0
-tqdm>=4.62.0
-networkx>=2.6.3
-trimesh>=3.9.0
-einops>=0.4.1
-timm>=0.6.0
-flash-attn>=2.0.0
-lightning-attn>=1.0.0
-wandb>=0.13.0
-pathlib>=1.0.1
-```
+
 
 ## 📊 Dataset
 
-This project uses the ShapeNet dataset processed by [MeshGPT](https://github.com/audi/MeshGPT) 🏆
+This project leverages the ShapeNet dataset processed by [MeshGPT](https://github.com/audi/MeshGPT) 🏆
 
 <details>
 <summary>📥 Dataset Preparation</summary>
@@ -102,17 +90,6 @@ To generate meshes using a trained checkpoint:
 python test.py "path/to/checkpoint"
 ```
 
-## 🧠 Model Architecture
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x300?text=iFlame+Architecture" alt="Model Architecture" width="700"/>
-</div>
-
-iFlame uses an innovative attention mechanism that interleaves full attention with linear attention to achieve efficient mesh generation while maintaining high quality outputs:
-
-- 🔄 Alternating layers of full and linear attention
-- ⚡ Optimized memory usage and computational efficiency
-- 🔍 Fine-grained detail preservation despite reduced complexity
 
 ## 📝 Citation
 
@@ -133,7 +110,7 @@ If you use this code in your research, please cite:
 ## 🙏 Acknowledgements
 
 - Thanks to the authors of [MeshGPT](https://github.com/audi/MeshGPT) for the dataset preprocessing
-- the  code is based on is shape2vecset, lightning attention, flash attention 
+- Implementation built upon foundations from Shape2VecSet, Lightning Attention, and Flash Attention
 - Developed with support from the research community
 
 ---
@@ -141,4 +118,3 @@ If you use this code in your research, please cite:
 <div align="center">
   <b>✨ Star this repository if you find it useful! ✨</b>
 </div>
-
