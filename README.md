@@ -2,16 +2,13 @@
 
 <div align="center">
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/iFlame?style=social)
+![GitHub stars](https://img.shields.io/github/stars/hanxiaowang00/iFlame?style=social)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-EE4C2C.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**A breakthrough single-GPU trainable unconditional mesh generative model** 🚀
+**A single-GPU trainable unconditional mesh generative model** 🚀
 
-<p align="center">
-  <img src="https://via.placeholder.com/800x400?text=iFlame+Mesh+Generation" alt="iFlame Demo" width="600"/>
-</p>
 
 </div>
 
@@ -44,7 +41,7 @@ pip install -r requirements.txt
 
 ## 📊 Dataset
 
-This project leverages the ShapeNet dataset processed by [MeshGPT](https://github.com/audi/MeshGPT) 🏆
+This project leverages the ShapeNet dataset processed by [MeshGPT](https://github.com/audi/MeshGPT) 
 
 <details>
 <summary>📥 Dataset Preparation</summary>
