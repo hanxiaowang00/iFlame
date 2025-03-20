@@ -94,9 +94,9 @@ If you use this code in your research, please cite:
 ```bibtex
 @article{iflame2025,
   title={iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation},
-  author={Wang, Hanxiao and Zhang, Biao and Quan, Weize and Yan, Dong-Ming and Wonka, Peter},
+  author={Hanxiao Wang and Biao Zhang and Weize Quan and Dong-Ming Yan and Peter Wonka},
   journal={arXiv preprint},
-  year={2023}
+  year={2025}
 }
 ```
 
