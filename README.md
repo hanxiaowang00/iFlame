@@ -28,7 +28,7 @@ This project has been thoroughly tested on:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/iFlame.git
+git clone https://github.com/hanxiaowang00/iFlame.git
 cd iFlame
 
 # Install dependencies
