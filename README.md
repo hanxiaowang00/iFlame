@@ -11,7 +11,6 @@
 
 **A single-GPU trainable unconditional mesh generative model** 🚀
 
-## Project Page
 For more information, visit the project page: [iFlame Project Page](https://wanghanxiao123.github.io/iFa/)
 
 </div>
