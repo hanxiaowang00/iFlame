@@ -7,8 +7,12 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-EE4C2C.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
+
+
 **A single-GPU trainable unconditional mesh generative model** 🚀
 
+## Project Page
+For more information, visit the project page: [iFlame Project Page](https://wanghanxiao123.github.io/iFa/)
 
 </div>
 
