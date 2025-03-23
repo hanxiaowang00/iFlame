@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation">
+    <meta name="keywords" content="iFlame, Mesh Generation, Transformer, Linear Attention">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+
+    <style>
+        .chart-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            width: 100%;
+            position: relative;
+        }
+        
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        
+        .chart-bar {
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 20px;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -20px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .chart-label {
+            font-size: 10px;
+            transform: rotate(-45deg);
+            margin-bottom: 10px;
+            margin-top: auto;
+            white-space: nowrap;
+        }
+		.render_wrapper {
+			position: relative;
+            height: 300px;
+         }
+        .render_wrapper_small {
+			position: relative;
+            height: 200px;
+         }
+		.render_div {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+
+        #interpolation-image-wrapper-car{
+            text-align: center;
+        }
+        #interpolation-image-wrapper-chair{
+            text-align: center;
+        }
+        .nested-columns {
+            margin-bottom: 0 !important;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script src="./static/js/bulma-carousel.min.js"></script>
+    <script src="./static/js/bulma-slider.min.js"></script>
+    <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <h1 class="title is-1 publication-title">iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation</h1>    
+			<!-- <h2 class="is-size-3">ICCV 2025</h2> -->
+                        <div class="is-size-4 publication-authors">
+                            <span class="author-block">
+                                <a href="#">Hanxiao Wang</a><sup>1,2</sup>,</span>
+                                <span class="author-block">
+                                <a href="#">Biao Zhang</a><sup>2</sup><span style="color: black;">*</span>,</span>
+                                
+                            <span class="author-block">
+                                <a href="#">Weize Quan</a><sup>1</sup>,</span>
+                            <span class="author-block">
+                                <a href="#">Dong-Ming Yan</a><sup>1</sup>,
+                            </span>
+                            <span class="author-block">
+                                <a href="#">Peter Wonka</a><sup>2</sup>
+                            </span>
+                        </div>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block"><sup>1</sup>CASIA,</span>
+                            <span class="author-block"><sup>2</sup>KAUST</span>
+                        </div>
+                        <p style="color: black;">* Corresponding author</p>
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <!-- PDF Link. -->
+                                <span class="link-block">
+                                    <a href="#"
+                                        class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </span>
+                                        <span>Paper</span>
+                                    </a>
+                                </span>
+                                <span class="link-block">
+                                    <a class="external-link button is-normal is-rounded is-dark" href="#">
+                                        <span class="icon">
+                                            <i class="ai ai-arxiv"></i>
+                                        </span>
+                                        <span>arXiv</span>
+                                    </a>
+                                </span>
+                                <!-- Github Link. -->
+                                <span class="link-block">
+                                    <a href="https://github.com/hanxiaowang00/iFlame" class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="fab fa-github"></i>
+                                        </span>
+                                        <span>Code</span>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="is-size-5" style="margin-top: 10px;">
+                            A <span style="color: #e63946; font-weight: bold;">single-GPU</span> trainable <span style="color: #1d3557; font-weight: bold;">unconditional</span> <span style="color: #2a9d8f; font-weight: bold;">efficient</span> mesh generative model
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button id="prevButton" class="button is-primary">Previous Page</button>
+                    <button id="nextButton" class="button is-primary">Next Page</button>
+                    <!-- <span id="pageIndicator" style="margin-left: 15px; font-weight: bold;">Page 1/9</span> -->
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_1" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_2" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_3" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_4" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_5" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_6" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_7" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_8" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_9" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_10" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_11" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_12" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_13" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_14" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_15" class="render_div"></div>
+                    </div>
+                    <div class="column is-3 render_wrapper_small">
+                        <div id="mesh_16" class="render_div"></div>
+                    </div>
+                </div>
+                <div style="text-align: center;">Press <b>G</b> to toggle wireframe. Press <b>R</b> to reset view.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <!-- Abstract. -->
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Abstract</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                        This paper describes a novel transformer-based network architecture for large mesh generation. While attention-based models have demonstrated remarkable performance in mesh generation, their quadratic computational complexity limits scalability, particularly for high-resolution 3D data. Conversely, linear attention mechanisms offer lower computational costs but often struggle to capture long-range dependencies, resulting in suboptimal outcomes.
+                        </p>
+                        <p>
+                        To address this trade-off, we propose an interleaving autoregressive mesh generation framework that combines the efficiency of linear attention with the expressive power of standard attention mechanisms. To further enhance efficiency and leverage the inherent structure of mesh representations, we integrate this interleaving approach into an hourglass architecture, which significantly boosts efficiency.
+                        </p>
+                        <p>
+                        Our approach reduces training time while achieving performance comparable to pure attention-based models. To improve inference efficiency, we implemented a caching algorithm that almost doubles the speed and reduces the KV cache size by seven-eighths compared to the original Transformer. We evaluate our framework on ShapeNet and Objaverse, demonstrating its ability to generate high-quality 3D meshes efficiently. Our results indicate that the proposed interleaving framework effectively balances computational efficiency and generative performance, making it a practical solution for mesh generation. The training takes only 2 days with 4 GPUs on 39k data with a maximum of 4k faces on Objaverse.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview. -->
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Method Overview</h2>
+                    <div class="content has-text-centered">
+                        <img src="./static/teaser/pipeline.png" alt="iFlame pipeline architecture" style="max-width: 100%;">
+                    </div>
+                    <div class="content has-text-justified" style="padding-top: 15px">
+                        <p><strong>iFlame</strong> is a <span style="color: #2a9d8f; font-weight: bold;">highly efficient</span> <span style="color: #1d3557; font-weight: bold;">unconditional</span> <span style="color: #e63946; font-weight: bold;">single-GPU trainable</span> mesh generation model that combines the efficiency of linear attention with the expressive power of standard attention mechanisms through an interleaving framework. We integrate this approach into an hourglass architecture to enhance efficiency and leverage the inherent structure of mesh representations.</p>
+                        <p>Key contributions of our approach include:</p>
+                        <ul>
+                            <li>An interleaving autoregressive mesh generation framework</li>
+                            <li>Integration with an hourglass architecture for improved efficiency</li>
+                            <li>A novel caching algorithm that nearly doubles inference speed</li>
+                            <li>Reduction of KV cache size by seven-eighths compared to original Transformers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Comparison -->
+            <div class="columns is-centered has-text-centered">
+                        <div class="column is-four-fifths">
+                            <h2 class="title is-3">Performance Comparison</h2>
+                            <div class="content has-text-centered">
+                                <img src="./static/teaser/compare.png" alt="Performance comparison of our iFlame architecture" style="max-width: 100%;">
+                            </div>
+                            
+                            <!-- Chart Caption -->
+                            <div class="content has-text-justified" style="margin-top: 20px;">
+                                <p>
+                                    <strong>Figure:</strong> Performance comparison of our iFlame architecture. 
+                                    <strong>(a)</strong> Our model achieves 1.8× higher inference throughput (81.9 t/s vs. 45.0 t/s). 
+                                    <strong>(b)</strong> Our model maintains low KV cache usage (0.8GB) while full attention requires 8.3× more memory when generating 4000 faces. 
+                                    <strong>(c, d, e)</strong> Our model reduces training time by 46% (227 min vs. 422 min), requires 38% less GPU memory during training (28GB vs. 45GB per GPU), and maintains face accuracy (78.1% vs. 78.3%) compared to baseline methods on ShapeNet with 2B tokens.
+                                </p>
+                            </div>
+                        </div>
+            </div>
+
+
+
+            <!-- Related Work -->
+            <!-- <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Related Links</h2>
+
+                    <div class="content has-text-justified">
+                        <p>
+                            For more work on similar tasks, please check out:
+                        </p>
+                        <p>
+                            <a href="https://arxiv.org/abs/2002.10880">PolyGen: An Autoregressive Generative Model of 3D Meshes</a>
+                        </p>
+                        <p>
+                            <a href="https://meshdiffusion.github.io/">Mesh Diffusion</a>
+                        </p>
+                        <p>
+                            <a href="https://github.com/audi/MeshGPT">MeshGPT: Generating Triangle Meshes with Decoder-Only Transformers</a>
+                        </p>
+                    </div>
+                </div>
+            </div> -->
+
+
+        </div>
+    </section>
+
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop content">
+            <h2 class="title">BibTeX</h2>
+            <pre>
+                <!-- <code>@inproceedings{wang2025iflame, -->
+  title={iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation},
+  author={Wang, Hanxiao and Zhang, Biao and Quan, Weize and Yan, Dong-Ming and Wonka, Peter},
+  <!-- booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)}, -->
+  year={2025}
+<!-- } -->
+</code>
+            </pre>
+        </div>
+    </section>
+
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        import { PLYLoader } from './js/PLYLoader.js';
+        import { OrbitControls } from './js/OrbitControls.js'
+        let div_to_scene = {};
+        for (let i = 1; i <= 16; i++) {
+            div_to_scene["mesh_" + i] = {
+                "geo": null,
+                "color": null
+            };
+        }
+        let div_to_render_scene = {
+            "mesh_style_0": {
+                "0": null,
+                "1": null,
+                "2": null,
+                "geo": null,
+            },
+            "mesh_style_1": {
+                "0": null,
+                "1": null,
+                "2": null,
+                "geo": null,
+            },
+            "mesh_style_2": {
+                "0": null,
+                "1": null,
+                "2": null,
+                "geo": null,
+            },
+            "mesh_style_3": {
+                "0": null,
+                "1": null,
+                "2": null,
+                "geo": null,
+            },
+        }
+        let mouse_button_down = false;
+        let list_of_orbit_controls = []
+        let style_camera = null;
+        let render_colors = true;
+        let style_id = "0"
+
+        // Page navigation variables
+        let currentPage = 0; // 0-based index for the current page (0, 1, 2, 3)
+        const modelsPerPage = 16;
+        const totalPages = 9; // We have 64 models total, so 4 pages
+
+        function setup_camera(div_name){
+            let container = document.getElementById(div_name);
+            let width = container.parentElement.clientWidth;
+            let height = container.parentElement.clientHeight;
+            let camera = new THREE.PerspectiveCamera( 35, width / height, 0.1, 50 );
+
+            let camera_init_position = new THREE.Vector3(3.75, 3.75, 3.75 );
+            camera_init_position = camera_init_position.multiplyScalar(1)
+            camera.position.set(camera_init_position.x, camera_init_position.y, camera_init_position.z);
+            return camera;
+        }
+
+        function setup_render_divs(div_name, mesh_path){
+            let camera = setup_camera(div_name)
+            let orbit_control = create_render_div(camera, div_name, mesh_path)
+            list_of_orbit_controls.push(orbit_control)
+        }
+
+        function create_render_div(camera, div_id, mesh_path) {
+            let container;
+            let renderer, controls;
+
+            init();
+            animate();
+
+            function init() {
+
+                container = document.getElementById(div_id);
+                let width = container.parentElement.clientWidth;
+                let height = container.parentElement.clientHeight;
+
+
+                div_to_scene[div_id]["color"] = new THREE.Scene();
+                div_to_scene[div_id]["geo"] = new THREE.Scene();
+                div_to_scene[div_id]["color"].background = new THREE.Color( 0xffffff );
+                div_to_scene[div_id]["geo"].background = new THREE.Color( 0xffffff );
+
+                // PLY file
+
+                const loader = new PLYLoader();
+                loader.load( mesh_path, function ( geometry ) {
+
+                    geometry.computeVertexNormals();
+                    let material_color = new THREE.MeshStandardMaterial( { color: 0xaaaaaa, flatShading: true, side: THREE.DoubleSide } )
+                    let material_geo = new THREE.MeshStandardMaterial( { color: 0x444444, flatShading: true, side: THREE.DoubleSide } )
+
+                    let wireframe = new THREE.WireframeGeometry( geometry );
+                    let line = new THREE.LineSegments( wireframe );
+                    line.material.color.setHex(0x000000);
+
+                    const mesh_color = new THREE.Mesh( geometry, material_color );
+                    const mesh_geo = new THREE.Mesh( geometry, material_geo );
+
+                    div_to_scene[div_id]["color"].add( mesh_color );
+                    div_to_scene[div_id]["color"].add(line);
+                    div_to_scene[div_id]["geo"].add( mesh_geo );
+
+                }, (xhr) => {
+                    console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+                }, (error) => {
+                    console.log(error)
+                }
+                );
+
+                // lights
+
+                div_to_scene[div_id]["color"].add( new THREE.HemisphereLight( 0x333333, 0x222222 ) );
+                div_to_scene[div_id]["geo"].add( new THREE.HemisphereLight( 0x333333, 0x222222 ) );
+                addShadowedLight(div_to_scene[div_id]["color"], 1, 1, 1, 0xffffff, 1.35 / 2 );
+                addShadowedLight(div_to_scene[div_id]["color"],  0.5, 1, - 1, 0xffffff, 1 / 2 );
+                addShadowedLight(div_to_scene[div_id]["geo"], 1, 1, 1, 0xffffff, 1.35 );
+                addShadowedLight(div_to_scene[div_id]["geo"],  0.5, 1, - 1, 0xffffff, 1 );
+
+                // renderer
+
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( width, height);
+                renderer.outputEncoding = THREE.sRGBEncoding;
+
+                renderer.shadowMap.enabled = true;
+
+                container.appendChild( renderer.domElement );
+
+                controls = new OrbitControls(camera, renderer.domElement)
+                controls.enableDamping = false
+
+                // resize
+
+                window.addEventListener( 'resize', onWindowResize );
+
+            }
+            function onWindowResize() {
+                let width = container.clientWidth;
+                let height = container.clientHeight;
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize( width, height );
+            }
+            function animate() {
+                requestAnimationFrame( animate );
+                render();
+            }
+
+            function render() {
+                renderer.render( div_to_scene[div_id][render_colors ? "color" : "geo"], camera );
+                controls.update();
+            }
+
+            return controls;
+        }
+
+        function addShadowedLight(scene, x, y, z, color, intensity ) {
+
+            const directionalLight = new THREE.DirectionalLight( color, intensity );
+            directionalLight.position.set( x, y, z );
+            scene.add( directionalLight );
+
+            directionalLight.castShadow = true;
+
+            const d = 1;
+            directionalLight.shadow.camera.left = - d;
+            directionalLight.shadow.camera.right = d;
+            directionalLight.shadow.camera.top = d;
+            directionalLight.shadow.camera.bottom = - d;
+
+            directionalLight.shadow.camera.near = 1;
+            directionalLight.shadow.camera.far = 4;
+
+            directionalLight.shadow.mapSize.width = 1024;
+            directionalLight.shadow.mapSize.height = 1024;
+
+            directionalLight.shadow.bias = - 0.001;
+
+        }
+
+        // Function to update models for the current page
+        function updateModelsForPage(page) {
+            // Clear existing meshes from scenes
+            for (let i = 1; i <= modelsPerPage; i++) {
+                const divId = "mesh_" + i;
+                
+                // Remove meshes from color scene
+                if (div_to_scene[divId]["color"]) {
+                    // Find and remove mesh objects (keeping lights)
+                    const objectsToRemove = [];
+                    div_to_scene[divId]["color"].traverse(function(object) {
+                        if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
+                            objectsToRemove.push(object);
+                        }
+                    });
+                    
+                    for (const object of objectsToRemove) {
+                        if (object.geometry) object.geometry.dispose();
+                        if (object.material) {
+                            if (Array.isArray(object.material)) {
+                                for (const material of object.material) {
+                                    material.dispose();
+                                }
+                            } else {
+                                object.material.dispose();
+                            }
+                        }
+                        div_to_scene[divId]["color"].remove(object);
+                    }
+                }
+                
+                // Remove meshes from geo scene
+                if (div_to_scene[divId]["geo"]) {
+                    // Find and remove mesh objects (keeping lights)
+                    const objectsToRemove = [];
+                    div_to_scene[divId]["geo"].traverse(function(object) {
+                        if (object instanceof THREE.Mesh) {
+                            objectsToRemove.push(object);
+                        }
+                    });
+                    
+                    for (const object of objectsToRemove) {
+                        if (object.geometry) object.geometry.dispose();
+                        if (object.material) {
+                            if (Array.isArray(object.material)) {
+                                for (const material of object.material) {
+                                    material.dispose();
+                                }
+                            } else {
+                                object.material.dispose();
+                            }
+                        }
+                        div_to_scene[divId]["geo"].remove(object);
+                    }
+                }
+                
+                // Load new model
+                const modelIndex = page * modelsPerPage + i - 1;
+                const modelID = modelIDs[modelIndex];
+                
+                // Load the new model
+                loadModel(divId, `./models/objaverse/${modelID}.ply`);
+            }
+            
+            // Update page indicator
+            document.getElementById("pageIndicator").textContent = `Page ${page + 1}/${totalPages}`;
+            
+            // Update button states
+            document.getElementById("prevButton").disabled = (page === 0);
+            document.getElementById("nextButton").disabled = (page === totalPages - 1);
+        }
+        
+        // Function to load a model into an existing scene
+        function loadModel(divId, meshPath) {
+            const loader = new PLYLoader();
+            loader.load(meshPath, function(geometry) {
+                geometry.computeVertexNormals();
+                let material_color = new THREE.MeshStandardMaterial({color: 0xaaaaaa, flatShading: true, side: THREE.DoubleSide});
+                let material_geo = new THREE.MeshStandardMaterial({color: 0x444444, flatShading: true, side: THREE.DoubleSide});
+
+                let wireframe = new THREE.WireframeGeometry(geometry);
+                let line = new THREE.LineSegments(wireframe);
+                line.material.color.setHex(0x000000);
+
+                const mesh_color = new THREE.Mesh(geometry, material_color);
+                const mesh_geo = new THREE.Mesh(geometry, material_geo);
+
+                div_to_scene[divId]["color"].add(mesh_color);
+                div_to_scene[divId]["color"].add(line);
+                div_to_scene[divId]["geo"].add(mesh_geo);
+            });
+        }
+
+        document.addEventListener('keydown', logKey);
+
+        function logKey(evt) {
+            if (evt.keyCode === 71 && !mouse_button_down) {
+                switch_geometry()
+            }
+            if (evt.keyCode === 82 && !mouse_button_down) {
+                list_of_orbit_controls.forEach(oc => {
+                    console.log(oc.object.position)
+                })
+                reset_orbit_controls()
+            }
+        }
+
+        function switch_geometry() {
+            render_colors = !render_colors
+        }
+
+        function reset_orbit_controls() {
+            list_of_orbit_controls.forEach(oc => {
+                oc.reset()
+            })
+        }
+
+        function set_style_0(){
+            style_id = "0"
+        }
+
+        function set_style_1(){
+            style_id = "1"
+        }
+
+        function set_style_2(){
+            style_id = "2"
+        }
+
+        document.body.onmousedown = function(evt) {
+            if (evt.button === 0)
+                mouse_button_down = true
+        }
+        document.body.onmouseup = function(evt) {
+            if (evt.button === 0)
+                mouse_button_down = false
+        }
+
+        const modelIDs = [
+        
+        309, 435, 311, 195, 177, 125, 97, 86, 66, 12, 22, 46, 63, 148, 240, 291, 2, 3, 9, 10, 11, 24, 28, 29, 30, 39, 33, 34, 35,  
+        53, 55, 64, 65, 66, 67, 70, 72, 75, 76, 77, 87, 85, 81, 
+        80, 93, 94, 95, 98, 103, 105, 109, 110, 116, 120, 122,  126, 127, 
+        129, 134, 135, 146,  149, 151, 157, 158, 160, 161, 163, 165, 167, 169, 170, 
+        174, 180, 182, 184, 186, 187, 189, 192, 196, 197, 205, 206, 226, 229, 
+        232, 233,  243, 244, 250, 252, 257, 258, 259, 261, 263, 262, 268, 279, 281, 
+        288, 293, 295, 297, 299,  310,  315, 360, 361, 373, 379, 348, 353, 
+        355, 322, 331, 387, 401, 406, 429, 432, 440, 442, 443, 446, 453, 456, 457, 461, 
+        462, 464, 465, 466, 467, 474, 476, 479, 488, 506, 500, 502, 507, 508];
+        // When the page loads, initialize all 16 meshes
+        window.onload = function() {
+            let slider = document.getElementsByClassName("slider")[0];
+            if (slider) {
+                slider.removeAttribute("tabIndex");
+            }
+            
+            // Set up initial 16 meshes
+            for (let i = 1; i <= 16; i++) {
+                const modelID = modelIDs[i-1];
+                setup_render_divs("mesh_" + i, `./models/objaverse/${modelID}.ply`);
+            }
+            
+            // Add navigation buttons
+            document.getElementById("prevButton").addEventListener("click", function() {
+                if (currentPage > 0) {
+                    currentPage--;
+                    updateModelsForPage(currentPage);
+                }
+            });
+            
+            document.getElementById("nextButton").addEventListener("click", function() {
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                    updateModelsForPage(currentPage);
+                }
+            });
+            
+            // Initial button state setup
+            updateModelsForPage(currentPage);
+        };
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+ 
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="content">
+                        <p style="text-align:center">
+                            Source code mainly borrowed from <a href="https://keunhong.com/">Keunhong Park</a>'s <a
+                                href="https://nerfies.github.io/">Nerfies website</a> and <a
+                                href="https://github.com/nihalsid/mesh-gpt/tree/main"> MeshGPT </a>.
+                        </p>
+                        <p style="text-align:center">
+                            Please contact <a href="https://nihalsid.github.io/">Yawar Siddiqui</a> for feedback and questions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
