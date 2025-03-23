@@ -11,7 +11,7 @@
 
 **A single-GPU trainable unconditional mesh generative model** 🚀
 
-For more information, visit the project page: [iFlame Project Page]([https://hanxiaowang00.github.io/iFlame/](https://hanxiaowang00.github.io/iFlame/))
+For more information, visit the project page: [iFlame Project Page](https://hanxiaowang00.github.io/iFlame/)
 
 </div>
 
