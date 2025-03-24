@@ -1,11 +1,9 @@
-torch
 numpy
 tqdm
 networkx
 trimesh
 einops
 timm
-flash-attn
 lightning-attn
 wandb
 matplotlib
