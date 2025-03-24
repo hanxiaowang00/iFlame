@@ -55,7 +55,6 @@ pip install flash-attn --no-build-isolation
 pip install -r requirements.txt
 ```
 
-### 📋 Dependencies (requirements.txt)
 
 
 
