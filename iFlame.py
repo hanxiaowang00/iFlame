@@ -1,6 +1,5 @@
 import glob
 import os
-# os.chdir('/home/wangh0t/treegen')
 import random
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
@@ -9,7 +8,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from typing import Optional
 import math
-import trimesh  # 确保已安装 trimesh 库
+import trimesh  
 import numpy as np
 from collections import OrderedDict
 import pickle
@@ -59,8 +58,8 @@ dic=129
 fnnn=2816
 # desired_faceso=262
 pad_symbol=dic
-start_symbol = dic+1  # 开始符号索引
-end_symbol = dic+2    # 结束符号索引
+start_symbol = dic+1  # 
+end_symbol = dic+2    # 
 from pathlib import Path
 # allmaxlen=100
 maaa=-100
