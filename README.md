@@ -19,7 +19,7 @@ arXiv: [https://arxiv.org/abs/2503.16653](https://arxiv.org/abs/2503.16653)
 
 ## ✨ Overview
 
-iFlame is a state-of-the-art 3D mesh generation framework that introduces a novel approach by strategically interleaving full and linear attention mechanisms. This innovative technique dramatically reduces computational requirements while preserving exceptional output quality, enabling effective training on just a single GPU.
+iFlame is a 3D mesh generation framework that introduces a novel approach by strategically interleaving full and linear attention mechanisms. This innovative technique dramatically reduces computational requirements while preserving exceptional output quality, enabling effective training on just a single GPU.
 
 ## 🛠️ Requirements
 
