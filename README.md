@@ -90,6 +90,9 @@ To generate meshes using a trained checkpoint:
 python test.py "path/to/checkpoint"
 ```
 
+We provide the ShapeNet checkpoint, which can be found at the following link:
+
+[ShapeNet Checkpoint](https://huggingface.co/spaces/hxddd/iFlame/blob/main/padded_datashapenet.npy40unet24mix0.001muonsmall.pth)
 
 
 ## 📝 Citation
