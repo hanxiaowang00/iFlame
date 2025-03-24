@@ -12,7 +12,7 @@
 **A single-GPU trainable unconditional mesh generative model** 🚀
 
 For more information, visit the project page: [iFlame Project Page](https://hanxiaowang00.github.io/iFlame/)
-
+arXiv: [https://arxiv.org/abs/2503.16653](https://arxiv.org/abs/2503.16653)
 </div>
 
 ---
@@ -95,11 +95,14 @@ python test.py "path/to/checkpoint"
 
 If you use this code in your research, please cite:
 ```bibtex
-@article{iflame2025,
-  title={iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation},
-  author={Hanxiao Wang and Biao Zhang and Weize Quan and Dong-Ming Yan and Peter Wonka},
-  journal={arXiv preprint},
-  year={2025}
+@article{wang2025iflameinterleavinglinearattention,
+      title={iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation}, 
+      author={Hanxiao Wang and Biao Zhang and Weize Quan and Dong-Ming Yan and Peter Wonka},
+      year={2025},
+      eprint={2503.16653},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2503.16653}, 
 }
 ```
 
