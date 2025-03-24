@@ -46,9 +46,12 @@ conda activate iFlame
 conda install -c "nvidia/label/cuda-12.1.0" cuda-toolkit
 
 # Step 6: Install PyTorch and its related packages
-pip install torch torchvision torchaudio
+pip install torch==2.5.1 torchvision torchaudio
 
-# Step 7: Install additional dependencies from requirements.txt
+# Step 7: Install flash-attn without build isolation
+pip install flash-attn --no-build-isolation
+
+# Step 8: Install additional dependencies from requirements.txt
 pip install -r requirements.txt
 ```
 
