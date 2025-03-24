@@ -171,9 +171,9 @@ class DifferentialTransformerBlockrope(nn.Module):
                     element_size)
         
         # V cache size
-        v_cache_size = k_cache_size  # K和V cache大小相同
+        v_cache_size = k_cache_size  
         
-        # 总缓存大小
+       
         total_cache_size = k_cache_size + v_cache_size
         cache_size_gb = total_cache_size / (1024**3)
         return cache_size_gb
@@ -249,7 +249,7 @@ class DifferentialTransformerBlocklinearrope(nn.Module):
                     element_size)
         
 
-        # 总缓存大小
+   
         total_cache_size = kv_cache_size
         cache_size_gb = total_cache_size / (1024**3)    
         return cache_size_gb
@@ -368,7 +368,7 @@ class iFlame(nn.Module):
 
 
     def init_kv_cache(self, batch_size, max_len=90, dtype=torch.float16):
-        """初始化推理状态"""
+     
         Gb=0
         self.use_cache = True
         self.inference_state = {
@@ -378,20 +378,20 @@ class iFlame(nn.Module):
             'dtype': dtype,
             'batch_size': batch_size,
             'max_len': max_len,
-            # 跟踪每层中间状态
+          
             'layer_states': {
-                'encoder_0': None,  # 第一个encoder的输出
-                'encoder_1': None,  # 第二个encoder的输出
-                # 'bottleneck': None,  # bottleneck的输出
+                'encoder_0': None,  
+                'encoder_1': None,  
+                # 'bottleneck': None,  
             },
-            # 跟踪上次上采样的结果，用于跳跃连接
+    
             'upsampled_states': {
                 'decoder_0': None,
                 'decoder_1': None
             }
         }
         ll=[1,3,9]
-        # 初始化每个块的KV缓存
+    
         for scale in range(self.depth):
             for i, block in enumerate(self.encoder_blocks[scale]):
                  Gb+=block.init_kv_cache(batch_size, max_len//ll[scale], dtype)
@@ -408,9 +408,9 @@ class iFlame(nn.Module):
         return Gb
     
     def reset_kv_cache(self):
-        """重置推理状态"""
+   
         if hasattr(self, 'inference_state'):
-            # 重置状态
+          
             self.inference_state['cur_pos'] = 0
             # self.inference_state['encoder_outputs'] = []
             self.inference_state['cache_initialized'] = False
@@ -424,7 +424,7 @@ class iFlame(nn.Module):
                 'decoder_1': None
             }
             
-            # 重置每个块的KV缓存
+   
             for scale in range(self.depth):
                 for block in self.encoder_blocks[scale]:
                     block.reset_kv_cache()
@@ -440,51 +440,47 @@ class iFlame(nn.Module):
                     block.reset_kv_cache()
     
     def _process_first_tokens(self, x):
-        """处理初始token序列，构建初始缓存状态"""
 
         x = self.embedding(x)
         x = self.norm(x)
         
-        # === Encoder阶段 ===
+
         encoder_outputs = []
         
-        # Encoder层0 (A)
+
         for block in self.encoder_blocks[0]:
             x = block(x, use_cache=True)
         encoder_outputs.append(x)
         self.inference_state['layer_states']['encoder_0'] = x[:, -3:]
         
-        # 下采样
+
         x_downsampled = x.transpose(1, 2)
         x_downsampled = self.downsamplers[0](x_downsampled)
         x_downsampled = x_downsampled.transpose(1, 2)
         
-        # Encoder层1 (B)
+
         for block in self.encoder_blocks[1]:
             x_downsampled = block(x_downsampled, use_cache=True)
         encoder_outputs.append(x_downsampled)
         self.inference_state['layer_states']['encoder_1'] = x_downsampled[:, -3:]
         
-        # 再次下采样
+
         x_bottleneck = x_downsampled.transpose(1, 2)
         x_bottleneck = self.downsamplers[1](x_bottleneck)
         x_bottleneck = x_bottleneck.transpose(1, 2)
         
-        # Bottleneck层 (C)
+
         for block in self.bottlenecke:
             x_bottleneck = block(x_bottleneck, use_cache=True)
             
         for block in self.bottleneckd:
             x_bottleneck = block(x_bottleneck, use_cache=True)
         
-        # self.inference_state['layer_states']['bottleneck'] = x_bottleneck
-        
-        # === Decoder阶段 ===
-        # Decoder层0 (D)
+  
         x_upsampled = self.upsamplers[0](x_bottleneck.transpose(1, 2)).transpose(1, 2)
         self.inference_state['upsampled_states']['decoder_0'] = x_upsampled[:, -3:]
         
-        skip = encoder_outputs[1]  # 第二个encoder输出
+        skip = encoder_outputs[1]  
         
         x_upsampled = shift_sequence(x_upsampled, self.factor[0] - 1)
         x_upsampled = self.skip_weights2[0] * x_upsampled + skip
@@ -492,11 +488,11 @@ class iFlame(nn.Module):
         for block in self.decoder_blocks[0]:
             x_upsampled = block(x_upsampled, use_cache=True)
         
-        # Decoder层1 (E)
+
         x_final = self.upsamplers[1](x_upsampled.transpose(1, 2)).transpose(1, 2)
         self.inference_state['upsampled_states']['decoder_1'] = x_final[:, -3:]
         
-        skip = encoder_outputs[0]  # 第一个encoder输出
+        skip = encoder_outputs[0]  
         
         x_final = shift_sequence(x_final, self.factor[1] - 1)
         x_final = self.skip_weights2[1] * x_final + skip
@@ -504,160 +500,99 @@ class iFlame(nn.Module):
         for block in self.decoder_blocks[1]:
             x_final = block(x_final, use_cache=True)
         
-        # 最终输出投影
+
         logits = self.output_proj(x_final)
         
-        # 更新状态
-        # self.inference_state['encoder_outputs'] = encoder_outputs
+
         self.inference_state['cur_pos'] = x.shape[1]
         self.inference_state['cache_initialized'] = True
         
         return logits
     def _process_single_token(self, x):
-        """处理单个token的推理"""
+
         batch_size = x.shape[0]
         cur_pos = self.inference_state['cur_pos']
         
-        # 词嵌入和规范化
+
         x = self.embedding(x)
         x = self.norm(x)
         
-        # === 选择性更新策略 ===
-        update_encoder_0 = True  # 始终更新第一个encoder (A)
-        update_encoder_1 = (cur_pos + 1) % 3 == 0  # 当(n+1)是3的倍数时更新
-        update_bottleneck = (cur_pos + 1) % 9 == 0  # 当(n+1)是9的倍数时更新
-        update_decoder_0 = (cur_pos + 1) % 3 == 0  # 当(n+1)是3的倍数时更新
-        update_decoder_1 = True  # 始终更新最后一个decoder (E)
-        
-        # === Encoder阶段 (只处理单个token) ===
-        # Encoder层0 (A)
+ 
+        update_encoder_0 = True  
+        update_encoder_1 = (cur_pos + 1) % 3 == 0 
+        update_bottleneck = (cur_pos + 1) % 9 == 0 
+        update_decoder_0 = (cur_pos + 1) % 3 == 0  
+        update_decoder_1 = True  
+   
         if update_encoder_0:
             encoder_0_output = x
             for block in self.encoder_blocks[0]:
                 encoder_0_output = block(encoder_0_output, use_cache=True)
             self.inference_state['layer_states']['encoder_0'][:,cur_pos% 3:cur_pos% 3+1] = encoder_0_output
-            # 追加到当前序列，而不是替换
-            # if self.inference_state['layer_states']['encoder_0'] is not None:
-            #     self.inference_state['layer_states']['encoder_0'] = torch.cat(
-            #         [self.inference_state['layer_states']['encoder_0'], encoder_0_output], dim=1
-            #     )
-            # else:
-            #     self.inference_state['layer_states']['encoder_0'] = encoder_0_output
-            
-        # 如果需要更新第二层encoder
+          
         if update_encoder_1:
-            # 下采样时只考虑最近3个token（包括当前token）
+            
             recent_tokens = 3
-            # 获取最近的token的encoder_0输出
+      
             recent_encoder_outputs = self.inference_state['layer_states']['encoder_0']#[:, (cur_pos-2)% 3:(cur_pos)%3+1 ]
 
-            
-            # 下采样
             x_downsampled = recent_encoder_outputs.transpose(1, 2)
             x_downsampled = self.downsamplers[0](x_downsampled)
             x_downsampled = x_downsampled.transpose(1, 2)
             
-            # 第二层encoder处理
+          
             for block in self.encoder_blocks[1]:
                 x_downsampled = block(x_downsampled, use_cache=True)
             self.inference_state['layer_states']['encoder_1'][:,(cur_pos-2)%9//3:(cur_pos-2)%9//3+1] = x_downsampled
-            # 追加到当前序列，而不是替换
-            # if self.inference_state['layer_states']['encoder_1'] is not None:
-            #     self.inference_state['layer_states']['encoder_1'] = torch.cat(
-            #         [self.inference_state['layer_states']['encoder_1'], x_downsampled], dim=1
-            #     )
-            # else:
-            #     self.inference_state['layer_states']['encoder_1'] = x_downsampled
-        
-        # 如果需要更新bottleneck
+     
         if update_bottleneck:
-            # 再次下采样
+            
             recent_tokens = 3
-            # 获取最近的token的encoder_1输出
-            # if cur_pos > 2:  # 确保有足够的token
-            #     recent_encoder_1_outputs = self.inference_state['layer_states']['encoder_1'][:, -recent_tokens:]
-            # else:
+      
             recent_encoder_1_outputs = self.inference_state['layer_states']['encoder_1']#[:, -recent_tokens:]
             
             x_bottleneck = recent_encoder_1_outputs.transpose(1, 2)
             x_bottleneck = self.downsamplers[1](x_bottleneck)
             x_bottleneck = x_bottleneck.transpose(1, 2)
             
-            # Bottleneck层处理
+
             for block in self.bottlenecke:
                 x_bottleneck = block(x_bottleneck, use_cache=True)
             
             for block in self.bottleneckd:
                 x_bottleneck = block(x_bottleneck, use_cache=True)
             
-            # # 追加到当前序列，而不是替换
-            # if self.inference_state['layer_states']['bottleneck'] is not None:
-            #     self.inference_state['layer_states']['bottleneck'] = torch.cat(
-            #         [self.inference_state['layer_states']['bottleneck'], x_bottleneck], dim=1
-            #     )
-            # else:
-            #     self.inference_state['layer_states']['bottleneck'] = x_bottleneck
-                
-            # bottleneck更新后立即执行第一层上采样
+   
             bottleneck_output =x_bottleneck# self.inference_state['layer_states']['bottleneck']
             x_upsampled = self.upsamplers[0](bottleneck_output.transpose(1, 2)).transpose(1, 2)
             self.inference_state['upsampled_states']['decoder_0'] = x_upsampled
-            # 保存上采样结果
-            # if self.inference_state['upsampled_states']['decoder_0'] is not None:
-            #     self.inference_state['upsampled_states']['decoder_0'] = torch.cat(
-            #         [self.inference_state['upsampled_states']['decoder_0'], x_upsampled], dim=1
-            #     )
-            # else:
-            #     self.inference_state['upsampled_states']['decoder_0'] = x_upsampled
-        
-        # === Decoder阶段 ===
-        # 如果需要更新第一个decoder
+
         if update_decoder_0:
-            # 计算正确的上采样状态索引
-            # bottleneck每9个token更新一次，所以decoder_0的upsampled结果也是
-            upsampled_decoder0_idx = ((cur_pos-2)%9//3-2)%3  # 第一个上采样结果的索引
+           
+     
+            upsampled_decoder0_idx = ((cur_pos-2)%9//3-2)%3 
             
-            # 使用正确索引获取上采样结果
+     
             x_upsampled = self.inference_state['upsampled_states']['decoder_0'][:, upsampled_decoder0_idx:upsampled_decoder0_idx+1]
             
  
-            # 获取对应位置的encoder_1输出作为跳跃连接
-            # 使用基于cur_pos的索引来选择正确的token
-            encoder_1_skip_idx =  (cur_pos-2)%9//3   # 因为encoder_1是每3个token更新一次
+         
+            encoder_1_skip_idx =  (cur_pos-2)%9//3  
             encoder_1_output = self.inference_state['layer_states']['encoder_1'][:, encoder_1_skip_idx:encoder_1_skip_idx+1]
             
-            # 应用跳跃连接
+  
             x_upsampled = self.skip_weights2[0] * x_upsampled + encoder_1_output
             
-            # 第一个decoder处理
+
             for block in self.decoder_blocks[0]:
                 x_upsampled = block(x_upsampled, use_cache=True)
             
-            # decoder_0更新后立即执行第二层上采样
+
             x_final = self.upsamplers[1](x_upsampled.transpose(1, 2)).transpose(1, 2)
             
-            # 保存第二层上采样结果
-            # if self.inference_state['upsampled_states']['decoder_1'] is not None:
-            #     self.inference_state['upsampled_states']['decoder_1'] = torch.cat(
-            #         [self.inference_state['upsampled_states']['decoder_1'], x_final], dim=1
-            #     )
-            # else:
-            #     self.inference_state['upsampled_states']['decoder_1'] = x_final
+
             self.inference_state['upsampled_states']['decoder_1'] = x_final
-        # else:
-        #     # 使用之前处理好的结果，避免重复计算
-        #     # 计算正确的decoder_0位置索引 (每3个token更新一次)
-        #     decoder0_idx = (cur_pos // 3) - 1 if cur_pos >= 3 else 0
-        #     # 确保索引在有效范围内
-        #     decoder0_idx = max(0, min(decoder0_idx, self.inference_state['upsampled_states']['decoder_0'].shape[1] - 1))
-            
-        #     x_upsampled = self.inference_state['upsampled_states']['decoder_0'][:, decoder0_idx:decoder0_idx+1]
-            
-        #     # 当不更新decoder_0时，直接通过block保持KV缓存更新
-        #     for block in self.decoder_blocks[0]:
-        #         x_upsampled = block(x_upsampled, use_cache=True)
-        
-        # 计算正确的第二层上采样结果索引 (每3个token更新一次，与decoder_0同步)
+       
         if update_decoder_1:
             upsampled_decoder1_idx =  (cur_pos-2)%3
 
@@ -667,40 +602,36 @@ class iFlame(nn.Module):
 
             x_final = self.skip_weights2[1] * x_final + encoder_0_output
             
-            # 最后一个decoder处理
             for block in self.decoder_blocks[1]:
                 x_final = block(x_final, use_cache=True)
             
-        # 最终输出投影
+       
         logits = self.output_proj(x_final)
         
-        # 更新位置
+      
         self.inference_state['cur_pos'] += 1
         
         return logits
     def inference_step(self, x,pc=None, use_cache=True):
-        """
-        执行推理步骤，根据输入是序列还是单个token调用不同处理函数
-        """
-        # 确保已初始化
+      
         # self.cache_size=self.init_kv_cache(batch_size, max_seq_len, dtype=torch.float16)
         
         if not hasattr(self, 'inference_state'):
             self.cache_size=self.init_inference(x.shape[0])
         
-        # 根据是否已初始化缓存选择处理函数
+      
         if not self.inference_state['cache_initialized']:
             return self._process_first_tokens(x)
         else:
-            # 确保输入是单个token
+           
             if x.shape[1] > 1:
-                # 如果输入多个token，逐个处理
+                #
                 all_logits = []
                 for i in range(x.shape[1]):
                     token = x[:, i:i+1]
                     logits = self._process_single_token(token)
                     all_logits.append(logits)
-                # 连接所有结果
+               
                 return torch.cat(all_logits, dim=1)
             else:
                 return self._process_single_token(x)
