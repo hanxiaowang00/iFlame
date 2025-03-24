@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from typing import Optional
 import math
-import trimesh  # 确保已安装 trimesh 库
+import trimesh  # 
 import numpy as np
 from collections import OrderedDict
 import pickle
@@ -186,7 +186,7 @@ def main(rank, world_size):
             state_dict = torch.load(checkpoint_path)
             checkpoint = {}
             for k, v in state_dict['model_state_dict'].items():
-                new_key = k.replace('_orig_mod.', '')  # 去掉前缀
+                new_key = k.replace('_orig_mod.', '')  #
                 checkpoint[new_key] = v
             # model.load_state_dict(new_state_dict)
             model.module.load_state_dict(checkpoint, strict=True)
