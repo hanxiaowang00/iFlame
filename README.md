@@ -96,7 +96,7 @@ python test.py "path/to/checkpoint"
 If you use this code in your research, please cite:
 ```bibtex
 @article{wang2025iflameinterleavinglinearattention,
-      title={iFlame: Interleaving Full and Linear Attention for Efficient Mesh Generation}, 
+      title={{iFlame}: Interleaving Full and Linear Attention for Efficient Mesh Generation}, 
       author={Hanxiao Wang and Biao Zhang and Weize Quan and Dong-Ming Yan and Peter Wonka},
       year={2025},
       eprint={2503.16653},
