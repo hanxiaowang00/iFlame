@@ -30,11 +30,25 @@ This project has been thoroughly tested on:
 ### 📦 Installation
 
 ```bash
-# Clone the repository
+# Step 1: Clone the repository
 git clone https://github.com/hanxiaowang00/iFlame.git
+
+# Step 2: Navigate into the project directory
 cd iFlame
 
-# Install dependencies
+# Step 3: Create a new Conda environment with Python 3.10
+conda create -n iFlame python=3.10
+
+# Step 4: Activate the Conda environment
+conda activate iFlame
+
+# Step 5: Install the CUDA toolkit (version 12.1)
+conda install -c "nvidia/label/cuda-12.1.0" cuda-toolkit
+
+# Step 6: Install PyTorch and its related packages
+pip install torch torchvision torchaudio
+
+# Step 7: Install additional dependencies from requirements.txt
 pip install -r requirements.txt
 ```
 
