@@ -52,9 +52,9 @@ This project leverages the ShapeNet dataset processed by [MeshGPT](https://githu
 1. Download the processed dataset from the MeshGPT repository
 2. Place the dataset in the same directory level as the iFlame project
 3. The model expects the data to be in the format processed by MeshGPT
-
-If you want to train on Objaverse, we also provide an ID list (`objaverse_list.txt`) for your convenience.
 </details>
+If you want to train on Objaverse, we also provide an ID list (`objaverse_list.txt`) for your convenience.
+
 
 ## 🚀 Usage
 
