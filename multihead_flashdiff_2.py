@@ -95,7 +95,7 @@ class MultiheadFlashrope(nn.Module):
                 v = self.v_cache[:, :self.cache_pos + cache_len]
                 self.cache_pos += cache_len
                 if compute_attn_scores:
-                    # 计算当前query对所有之前位置的attention scores
+                    
                     # [batch_size, num_heads, 1, cache_len]
                     attn_weights = torch.matmul(q.transpose(1, 2), k.transpose(1, 2).transpose(-2, -1))
                     attn_weights = attn_weights * self.scaling
@@ -106,17 +106,7 @@ class MultiheadFlashrope(nn.Module):
             # Normal operation without cache
             q = self.rotary(q)
             k = self.rotary(k)
-        # if q.dtype!=k.dtype:    
-        #     print(q.dtype,k.dtype)
-        # if q.dtype!=v.dtype:
-        #     print(q.dtype,v.dtype)
-        # Compute attention with flash attention
-        # if self.training:
-        #     # 训练时使用flash attention
-        #     attn_output = flash_attn_func(q, k, v, causal=causal)
-        # else:
-        #     # 推理时使用PyTorch实现
-        #     attn_output = self.attention_pytorch(q, k, v, causal=causal)
+
         attn_output = flash_attn_func(q, k, v, causal=causal)
 
         # Reshape output
@@ -125,17 +115,17 @@ class MultiheadFlashrope(nn.Module):
 
         return attn_output
     def attention_pytorch(self, q, k, v, causal=False):
-        """PyTorch标准注意力实现，用于推理"""
+
         # [batch_size, num_heads, seq_len, head_dim]
         q = q.permute(0, 2, 1, 3)
         k = k.permute(0, 2, 1, 3)
         v = v.permute(0, 2, 1, 3)
 
-        # 计算注意力分数
+
         attn_weights = torch.matmul(q, k.transpose(-2, -1)) * self.scaling
 
         if causal:
-            # 创建因果mask
+    
             seq_len = q.size(-2)
             causal_mask = torch.triu(
                 torch.ones(seq_len, seq_len, dtype=torch.bool, device=q.device),
@@ -143,13 +133,13 @@ class MultiheadFlashrope(nn.Module):
             )
             attn_weights.masked_fill_(causal_mask, float('-inf'))
 
-        # 应用softmax
+  
         attn_weights = F.softmax(attn_weights, dim=-1)
         
-        # 计算输出
+  
         attn_output = torch.matmul(attn_weights, v)
         
-        # 恢复形状 [batch_size, seq_len, num_heads, head_dim]
+
         return attn_output.permute(0, 2, 1, 3)
 
     def empty_kv_cache(self, batch_size: int, kv_cache_maxlen: int, dtype: torch.dtype):
