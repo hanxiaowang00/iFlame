@@ -70,6 +70,8 @@ This project leverages the ShapeNet dataset processed by [MeshGPT](https://githu
 3. The model expects the data to be in the format processed by MeshGPT
 
 </details>
+If you want to train on Objaverse, we also provide an ID list (`objaverse_list.txt`) for your convenience.
+
 
 ## 🚀 Usage
 
